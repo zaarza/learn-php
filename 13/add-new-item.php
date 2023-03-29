@@ -1,19 +1,16 @@
 <?php 
     require("functions.php");
 
-    $id = $_GET["id"];
-    $item = query("SELECT * FROM items WHERE id = $id");
-
     if ( isset($_POST["submit"]) ) {
-        if (edit_item($id, $_POST) > 0) {
+        if (new_item($_POST) > 0) {
             echo "<script>
-                alert('Item updated');
+                alert('Item added');
                 document.location.href = 'index.php';
             </script>";
         } else {
             echo "<script>
-                alert('Failed to update item');
-                document.location.href = 'index.php';
+                alert('Failed');
+                document.location.href = 'add-new-item.php';
             </script>";
         };
     };
@@ -41,43 +38,43 @@
     </style>
 </head>
 <body>
-    <h1>Edit Item</h1>
+    <h1>New Item</h1>
     <a href="index.php">Back</a>
 
     <br><br>
 
-    <form class="new-item-form" action="" method="POST">
+    <form class="new-item-form" action="" method="POST" enctype="multipart/form-data">
         <div class="new-item-form__items">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" required value="<?= $item[0]["name"]?>">
+            <input type="text" name="name" id="name" required>
         </div>
     
         <div class="new-item-form__items">
             <label for="price">Price</label>
-            <input type="text" name="price" id="price" required value="<?= $item[0]["price"]?>">
+            <input type="text" name="price" id="price" required>
         </div>
     
         <div class="new-item-form__items">
             <label for="description">Description</label>
-            <input type="text" name="description" id="description" required value="<?= $item[0]["description"]?>">
+            <input type="text" name="description" id="description" required>
         </div>
     
         <div class="new-item-form__items">
             <label for="rating">Rating</label>
-            <input type="text" name="rating" id="rating" required value="<?= $item[0]["rating"]?>">
+            <input type="text" name="rating" id="rating" required>
         </div>
     
         <div class="new-item-form__items">
             <label for="image">Image</label>
-            <input type="text" name="image" id="image" required value="<?= $item[0]["image"]?>">
+            <input type="file" name="image" id="image">
         </div>
     
         <div class="new-item-form__items">
             <label for="sold">Sold</label>
-            <input type="text" name="sold" id="sold" required value="<?= $item[0]["sold"]?>">
+            <input type="text" name="sold" id="sold" required>
         </div>
 
-        <button type="submit" name="submit">Save</button>
+        <button type="submit" name="submit">+ Add</button>
     </form>
 </body>
 </html>

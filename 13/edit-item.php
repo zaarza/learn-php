@@ -38,6 +38,9 @@
             flex-direction: column;
             row-gap: 10px;
         }
+        .item-preview {
+            width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -45,8 +48,10 @@
     <a href="index.php">Back</a>
 
     <br><br>
+    <img class="item-preview" src="./assets/images/<?= $item[0]["image"] ?>" alt="">
 
-    <form class="new-item-form" action="" method="POST">
+    <form class="new-item-form" action="" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="previous_image" value="<?= $item[0]["image"]?>">
         <div class="new-item-form__items">
             <label for="name">Name</label>
             <input type="text" name="name" id="name" required value="<?= $item[0]["name"]?>">
@@ -69,7 +74,7 @@
     
         <div class="new-item-form__items">
             <label for="image">Image</label>
-            <input type="text" name="image" id="image" required value="<?= $item[0]["image"]?>">
+            <input type="file" name="image" id="image" value="<?= $item[0]["image"]?>">
         </div>
     
         <div class="new-item-form__items">

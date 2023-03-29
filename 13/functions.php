@@ -14,6 +14,52 @@
         return $itemsArray;
     };
 
+    function upload_image () {
+        $file_name = $_FILES["image"]["name"];
+        $file_tmp_location = $_FILES["image"]["tmp_name"];
+        $file_size = $_FILES["image"]["size"];
+        $error = $_FILES["image"]["error"];
+
+        // Check is there a file to upload
+        if ($error === 4) {
+            echo "<script>alert('No file to upload')</script>";
+            return false;
+        };
+
+        
+        // Check file is image file (method 1)
+        // $file_type = $_FILES["image"]["type"];
+        // $supported_formats = ['image/jpeg', 'image/png'];
+        // if ( !in_array( $file_type, $supported_formats ) ) {
+        //     echo "<script>alert('Only image file can uploaded')</script>";
+        //     return false;
+        // };
+
+        // Check file is image file (method 2)
+        $file_type = explode('.', $file_name);
+        $file_type = strtolower(end($file_type));
+        $supported_formats = ['jpg', 'png', 'jpeg'];
+
+        if ( !in_array( $file_type, $supported_formats ) ) {
+            echo "<script>alert('Only image file can uploaded')</script>";
+            return false;
+        }
+
+        // Check file size (max 1MB)
+        $max_size = 1000000;
+
+        if ( $file_size > $max_size ) {
+            echo "<script>alert('Max file image size is 1MB')</script>";
+            return false;
+        }
+        
+        $new_file_name = time() . '.' . $file_type;
+
+        move_uploaded_file($file_tmp_location, "assets/images/$new_file_name");
+
+        return $new_file_name;
+    };
+
     function new_item ($data) {
         global $connection;
 
@@ -21,7 +67,12 @@
         $price = htmlspecialchars($data["price"]);
         $description = htmlspecialchars($data["description"]);
         $rating = htmlspecialchars($data["rating"]);
-        $image = htmlspecialchars($data["image"]);
+        $image = upload_image();
+
+        if ( !$image ) {
+            return false;
+        };
+
         $sold = htmlspecialchars($data["sold"]);
 
         $ADD_ITEM_QUERY = "INSERT INTO items VALUES 
@@ -45,8 +96,14 @@
         $price = htmlspecialchars($data["price"]);
         $description = htmlspecialchars($data["description"]);
         $rating = htmlspecialchars($data["rating"]);
-        $image = htmlspecialchars($data["image"]);
+        $previous_image = htmlspecialchars($data["previous_image"]);
         $sold = htmlspecialchars($data["sold"]);
+
+        if ( $_FILES["image"]["error"] === 4 ) {
+            $image = $previous_image;
+        } else {
+            $image = upload_image();
+        }
 
         $EDIT_ITEM_QUERY = "UPDATE items SET 
                             name = '$name',

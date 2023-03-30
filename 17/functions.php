@@ -177,8 +177,6 @@
         // Login Success
         $_SESSION["id"] = $user["id"];
         $_SESSION["username"] = $user["username"];
-        setcookie(hash("sha256", "id"), hash("sha256", $user["id"]), time()+60);
-        setcookie(hash("sha256", "username"), hash("sha256", $user["username"]), time()+60);
         
         header("Location: index.php");
         return true;

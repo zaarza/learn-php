@@ -14,6 +14,10 @@
 
     if ( isset($_POST["submit"]) ) {
         if ( login($_POST) ) {
+            if (isset($_POST["remember"])) {
+                setcookie(hash("sha256", "id"), hash("sha256", $_SESSION["id"]), time()+60*60*24*2);
+                setcookie(hash("sha256", "username"), hash("sha256", $_SESSION["username"]), time()+60*60*24*2);
+            };
             header("Location: index.php");
             exit;
         } else {
@@ -57,6 +61,11 @@
         <div class="login-form__items">
             <label for="password">Password</label>
             <input type="password" name="password" id="password">
+        </div>
+
+        <div class="login-form__items">
+            <label for="remember">Remember me</label>
+            <input type="checkbox" name="remember" id="remember">
         </div>
 
         <button type="submit" name="submit">Login</button>

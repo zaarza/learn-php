@@ -2,6 +2,16 @@
     session_start();
     require("functions.php");
 
+    if ( !isset($_GET["keyword"]) ) {
+        $_GET["keyword"] = "";
+    };
+
+    if ( !isset($_GET["page"]) ){
+        $_GET["page"] = 1;
+    };
+
+    $keyword = $_GET["keyword"];
+
     if ( isset($_COOKIE[hash("sha256", "username")]) && isset($_COOKIE[hash("sha256", "id")])) {
         $_SESSION["username"] = $_COOKIE[hash("sha256", "username")];
         $_SESSION["id"] = $_COOKIE[hash("sha256", "id")];
@@ -12,26 +22,19 @@
         exit;
     };
 
-    if (isset($_GET["search"])) {
-        $keyword = $_GET["keyword"];
-        $items = search_item($keyword);
-    };
-    
-    $index = 0;
-
-    // Pagination
-    $total_data = count(query("SELECT * FROM items"));
-    $total_data_per_page = 3;
-    $total_page = ceil($total_data / $total_data_per_page);
-
-    if ( !isset($_GET["page"]) ){
-        $_GET["page"] = 1;
-    };
-
     $current_page = $_GET["page"];
+    $total_data_per_page = 3;
     $initial_data = ($current_page * $total_data_per_page) - $total_data_per_page;
 
-    $items = query("SELECT * FROM items LIMIT $initial_data, $total_data_per_page");
+    if ( $keyword != '') {
+        $items = query("SELECT * FROM items WHERE name LIKE '%$keyword%' LIMIT $initial_data, $total_data_per_page");
+        $total_data = count(query("SELECT * FROM items WHERE name LIKE '%$keyword%'"));
+    } else {
+        $total_data = count(query("SELECT * FROM items"));
+        $items = query("SELECT * FROM items LIMIT $initial_data, $total_data_per_page");
+    };
+
+    $total_page = ceil($total_data / $total_data_per_page);
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +85,7 @@
 </head>
 <body>
     <a href="logout.php">Logout</a>
+    <a href="index.php">RESET</a>
     <h1>Item List</h1>
     <a href="add-new-item.php">Add new item</a>
 
@@ -97,12 +101,12 @@
     <br>
 
 
-    <?php if ($current_page != 1) : ?>
+    <?php if ($current_page > 1) : ?>
         <a href="?page=<?= $current_page - 1 ?>">&laquo;</a>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $total_page; $i++) : ?>
-        <a href="?page=<?= $i ?>" class="<?= $i == $current_page ? 'active' : '' ?>"><?= $i ?></a>
+        <a href="./?keyword=<?= $keyword ?>&page=<?= $i ?>" class="<?= $i == $current_page ? 'active' : '' ?>"><?= $i ?></a>
     <?php endfor; ?>
 
     <?php if ($current_page != $total_page) : ?>
@@ -125,9 +129,9 @@
             <th class="table__item table__item--head">Action</th>
         </tr>
 
-        <?php foreach($items as $item) : ?>
+        <?php foreach($items as $index => $item) : ?>
             <tr>
-                <td class="table__item"><?= $index += 1 ?></td>
+                <td class="table__item"><?= $initial_data + $index + 1 ?></td>
                 <td class="table__item"><?= $item["name"] ?></td>
                 <td class="table__item">Rp. <?= $item["price"] ?></td>
                 <td class="table__item"><?= $item["description"] ?></td>
